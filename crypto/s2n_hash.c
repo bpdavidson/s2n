@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include <openssl/md5.h>
-#include <openssl/sha.h>
-
 #include "error/s2n_errno.h"
 
 #include "crypto/s2n_hash.h"
@@ -47,26 +44,26 @@ int s2n_hash_init(struct s2n_hash_state *state, s2n_hash_algorithm alg)
         r = 1;
         break;
     case S2N_HASH_MD5:
-        r = MD5_Init(&state->hash_ctx.md5);
+        r = EVP_DigestInit(&state->hash_ctx.mdctx, EVP_md5());
         break;
     case S2N_HASH_SHA1:
-        r = SHA1_Init(&state->hash_ctx.sha1);
+        r = EVP_DigestInit(&state->hash_ctx.mdctx, EVP_sha1());
         break;
     case S2N_HASH_SHA224:
-        r = SHA224_Init(&state->hash_ctx.sha224);
+        r = EVP_DigestInit(&state->hash_ctx.mdctx, EVP_sha224());
         break;
     case S2N_HASH_SHA256:
-        r = SHA256_Init(&state->hash_ctx.sha256);
+        r = EVP_DigestInit(&state->hash_ctx.mdctx, EVP_sha256());
         break;
     case S2N_HASH_SHA384:
-        r = SHA384_Init(&state->hash_ctx.sha384);
+        r = EVP_DigestInit(&state->hash_ctx.mdctx, EVP_sha384());
         break;
     case S2N_HASH_SHA512:
-        r = SHA512_Init(&state->hash_ctx.sha512);
+        r = EVP_DigestInit(&state->hash_ctx.mdctx, EVP_sha512());
         break;
     case S2N_HASH_MD5_SHA1:
-        r = SHA1_Init(&state->hash_ctx.md5_sha1.sha1);
-        r &= MD5_Init(&state->hash_ctx.md5_sha1.md5);
+        r = EVP_DigestInit(&state->hash_ctx.md5_sha1.sha1_ctx, EVP_sha1());
+        r &= EVP_DigestInit(&state->hash_ctx.md5_sha1.md5_ctx, EVP_md5());
         break;
 
     default:
@@ -90,26 +87,26 @@ int s2n_hash_update(struct s2n_hash_state *state, const void *data, uint32_t siz
         r = 1;
         break;
     case S2N_HASH_MD5:
-        r = MD5_Update(&state->hash_ctx.md5, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.mdctx, data, size);
         break;
     case S2N_HASH_SHA1:
-        r = SHA1_Update(&state->hash_ctx.sha1, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.mdctx, data, size);
         break;
     case S2N_HASH_SHA224:
-        r = SHA224_Update(&state->hash_ctx.sha224, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.mdctx, data, size);
         break;
     case S2N_HASH_SHA256:
-        r = SHA256_Update(&state->hash_ctx.sha256, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.mdctx, data, size);
         break;
     case S2N_HASH_SHA384:
-        r = SHA384_Update(&state->hash_ctx.sha384, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.mdctx, data, size);
         break;
     case S2N_HASH_SHA512:
-        r = SHA512_Update(&state->hash_ctx.sha512, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.mdctx, data, size);
         break;
     case S2N_HASH_MD5_SHA1:
-        r = SHA1_Update(&state->hash_ctx.md5_sha1.sha1, data, size);
-        r &= MD5_Update(&state->hash_ctx.md5_sha1.md5, data, size);
+        r = EVP_DigestUpdate(&state->hash_ctx.md5_sha1.sha1_ctx, data, size);
+        r &= EVP_DigestUpdate(&state->hash_ctx.md5_sha1.md5_ctx, data, size);
         break;
     default:
         S2N_ERROR(S2N_ERR_HASH_INVALID_ALGORITHM);
@@ -131,32 +128,32 @@ int s2n_hash_digest(struct s2n_hash_state *state, void *out, uint32_t size)
         break;
     case S2N_HASH_MD5:
         eq_check(size, MD5_DIGEST_LENGTH);
-        r = MD5_Final(out, &state->hash_ctx.md5);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.mdctx, out, (unsigned int *)&size);
         break;
     case S2N_HASH_SHA1:
         eq_check(size, SHA_DIGEST_LENGTH);
-        r = SHA1_Final(out, &state->hash_ctx.sha1);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.mdctx, out, (unsigned int *)&size);
         break;
     case S2N_HASH_SHA224:
         eq_check(size, SHA224_DIGEST_LENGTH);
-        r = SHA224_Final(out, &state->hash_ctx.sha224);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.mdctx, out, (unsigned int *)&size);
         break;
     case S2N_HASH_SHA256:
         eq_check(size, SHA256_DIGEST_LENGTH);
-        r = SHA256_Final(out, &state->hash_ctx.sha256);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.mdctx, out, (unsigned int *)&size);
         break;
     case S2N_HASH_SHA384:
         eq_check(size, SHA384_DIGEST_LENGTH);
-        r = SHA384_Final(out, &state->hash_ctx.sha384);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.mdctx, out, (unsigned int *)&size);
         break;
     case S2N_HASH_SHA512:
         eq_check(size, SHA512_DIGEST_LENGTH);
-        r = SHA512_Final(out, &state->hash_ctx.sha512);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.mdctx, out, (unsigned int *)&size);
         break;
     case S2N_HASH_MD5_SHA1:
         eq_check(size, MD5_DIGEST_LENGTH + SHA_DIGEST_LENGTH);
-        r = SHA1_Final(((uint8_t *) out) + MD5_DIGEST_LENGTH, &state->hash_ctx.md5_sha1.sha1);
-        r &= MD5_Final(out, &state->hash_ctx.md5_sha1.md5);
+        r = EVP_DigestFinal_ex(&state->hash_ctx.md5_sha1.sha1_ctx, ((uint8_t *) out) + MD5_DIGEST_LENGTH, (unsigned int *)&size);
+        r &= EVP_DigestFinal_ex(&state->hash_ctx.md5_sha1.md5_ctx, out, (unsigned int *)&size);
         break;
     default:
         S2N_ERROR(S2N_ERR_HASH_INVALID_ALGORITHM);
@@ -171,11 +168,48 @@ int s2n_hash_digest(struct s2n_hash_state *state, void *out, uint32_t size)
 
 int s2n_hash_reset(struct s2n_hash_state *state)
 {
+    switch (state->alg) {
+    case S2N_HASH_NONE:
+    case S2N_HASH_MD5:
+    case S2N_HASH_SHA1:
+    case S2N_HASH_SHA224:
+    case S2N_HASH_SHA256:
+    case S2N_HASH_SHA384:
+    case S2N_HASH_SHA512:
+        EVP_MD_CTX_cleanup(&state->hash_ctx.mdctx);
+        break;
+    case S2N_HASH_MD5_SHA1:
+        EVP_MD_CTX_cleanup(&state->hash_ctx.md5_sha1.sha1_ctx);
+        EVP_MD_CTX_cleanup(&state->hash_ctx.md5_sha1.md5_ctx);
+        break;
+    default:
+        S2N_ERROR(S2N_ERR_HASH_INVALID_ALGORITHM);
+    }
+
     return s2n_hash_init(state, state->alg);
 }
 
 int s2n_hash_copy(struct s2n_hash_state *to, struct s2n_hash_state *from)
 {
-    memcpy_check(to, from, sizeof(struct s2n_hash_state));
+    switch (from->alg) {
+    case S2N_HASH_NONE:
+    case S2N_HASH_MD5:
+    case S2N_HASH_SHA1:
+    case S2N_HASH_SHA224:
+    case S2N_HASH_SHA256:
+    case S2N_HASH_SHA384:
+    case S2N_HASH_SHA512:
+        EVP_MD_CTX_copy(&to->hash_ctx.mdctx, &from->hash_ctx.mdctx);
+        break;
+    case S2N_HASH_MD5_SHA1:
+        EVP_MD_CTX_copy(&to->hash_ctx.md5_sha1.sha1_ctx, &from->hash_ctx.md5_sha1.sha1_ctx);
+        EVP_MD_CTX_copy(&to->hash_ctx.md5_sha1.md5_ctx, &from->hash_ctx.md5_sha1.md5_ctx);
+        break;
+    default:
+        S2N_ERROR(S2N_ERR_HASH_INVALID_ALGORITHM);
+    }
+
+    to->alg=from->alg;
+    
     return 0;
 }

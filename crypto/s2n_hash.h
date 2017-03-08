@@ -32,6 +32,7 @@
 
 #include <openssl/md5.h>
 #include <openssl/sha.h>
+#include <openssl/evp.h>
 
 #endif
 
@@ -53,15 +54,10 @@ typedef enum {
 struct s2n_hash_state {
     s2n_hash_algorithm alg;
     union {
-        MD5_CTX md5;
-        SHA_CTX sha1;
-        SHA256_CTX sha224;
-        SHA256_CTX sha256;
-        SHA512_CTX sha384;
-        SHA512_CTX sha512;
+        EVP_MD_CTX mdctx;
         struct {
-            MD5_CTX md5;
-            SHA_CTX sha1;
+            EVP_MD_CTX md5_ctx;
+            EVP_MD_CTX sha1_ctx;
         } md5_sha1;
     } hash_ctx;
 };

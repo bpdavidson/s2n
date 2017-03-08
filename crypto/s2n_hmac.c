@@ -92,6 +92,7 @@ static int s2n_sslv3_mac_digest(struct s2n_hmac_state *state, void *out, uint32_
 
     GUARD(s2n_hash_digest(&state->inner, state->digest_pad, state->digest_size));
     memcpy_check(&state->inner, &state->outer, sizeof(state->inner));
+    s2n_hash_copy(&state->inner, &state->outer);
     GUARD(s2n_hash_update(&state->inner, state->digest_pad, state->digest_size));
 
     return s2n_hash_digest(&state->inner, out, size);
@@ -247,7 +248,8 @@ int s2n_hmac_reset(struct s2n_hmac_state *state)
 {
     state->currently_in_hash_block = 0;
     memcpy_check(&state->inner, &state->inner_just_key, sizeof(state->inner));
-
+    s2n_hash_copy(&state->inner, &state->inner_just_key);
+    
     return 0;
 }
 
@@ -259,5 +261,9 @@ int s2n_hmac_digest_verify(const void *a, const void *b, uint32_t len)
 int s2n_hmac_copy(struct s2n_hmac_state *to, struct s2n_hmac_state *from)
 {
     memcpy_check(to, from, sizeof(struct s2n_hmac_state));
+    s2n_hash_copy(&to->inner, &from->inner);
+    s2n_hash_copy(&to->inner_just_key, &from->inner_just_key);
+    s2n_hash_copy(&to->outer, &from->outer);
+
     return 0;
 }
