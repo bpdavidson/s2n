@@ -19,6 +19,7 @@
 
 #include "crypto/s2n_hash.h"
 #include "crypto/s2n_hmac.h"
+#include "crypto/s2n_evp.h"
 
 #include "utils/s2n_blob.h"
 
@@ -27,9 +28,15 @@
 /* Enough to support TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, 2*SHA384_DIGEST_LEN + 2*AES256_KEY_SIZE */
 #define S2N_MAX_KEY_BLOCK_LEN 160
 
+union p_hash_state {
+    struct s2n_hmac_state s2n_hmac;
+    struct s2n_signed_evp_digest evp_hmac;
+};
+
 union s2n_prf_working_space {
     struct {
-        struct s2n_hmac_state hmac;
+        union p_hash_state p_hash;
+        const struct s2n_p_hash_implementation *p_hash_impl;
         uint8_t digest0[S2N_MAX_DIGEST_LEN];
         uint8_t digest1[S2N_MAX_DIGEST_LEN];
     } tls;
@@ -42,8 +49,20 @@ union s2n_prf_working_space {
     } ssl3;
 };
 
+struct s2n_p_hash_implementation {
+    int (*new) (union s2n_prf_working_space *ws);
+    int (*init) (union s2n_prf_working_space *ws, s2n_hmac_algorithm alg, struct s2n_blob *secret);
+    int (*update) (union s2n_prf_working_space *ws, const void *data, uint32_t size);
+    int (*final) (union s2n_prf_working_space *ws, void *digest, uint32_t size);
+    int (*reset) (union s2n_prf_working_space *ws);
+    int (*cleanup) (union s2n_prf_working_space *ws);
+    int (*free) (union s2n_prf_working_space *ws);
+};
+
 #include "tls/s2n_connection.h"
 
+extern int s2n_prf_new(struct s2n_connection *conn);
+extern int s2n_prf_free(struct s2n_connection *conn);
 extern int s2n_prf_master_secret(struct s2n_connection *conn, struct s2n_blob *premaster_secret);
 extern int s2n_prf_key_expansion(struct s2n_connection *conn);
 extern int s2n_prf_server_finished(struct s2n_connection *conn);
