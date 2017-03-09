@@ -191,6 +191,26 @@ struct s2n_cipher_preferences cipher_preferences_20160824 = {
     .minimum_protocol_version = S2N_TLS10
 };
 
+uint8_t wire_format_FIPS[] = {
+    TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
+    TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,
+    TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+    TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+    TLS_RSA_WITH_AES_128_CBC_SHA,
+    TLS_RSA_WITH_AES_128_GCM_SHA256,
+    TLS_RSA_WITH_AES_256_GCM_SHA384,
+    TLS_RSA_WITH_AES_128_CBC_SHA256,
+    TLS_RSA_WITH_AES_256_CBC_SHA,
+    TLS_RSA_WITH_AES_256_CBC_SHA256,
+    TLS_RSA_WITH_3DES_EDE_CBC_SHA
+};
+
+struct s2n_cipher_preferences cipher_preferences_FIPS = {
+    .count = sizeof(wire_format_FIPS) / S2N_TLS_CIPHER_SUITE_LEN,
+    .wire_format = wire_format_FIPS,
+    .minimum_protocol_version = S2N_TLS10
+};
+
 /* All supported ciphers. Only exposed for integration testing. */
 uint8_t wire_format_test_all[] = {
     TLS_RSA_WITH_RC4_128_MD5, TLS_RSA_WITH_RC4_128_SHA, TLS_RSA_WITH_3DES_EDE_CBC_SHA, TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA,
@@ -223,6 +243,7 @@ struct {
     "20160411", &cipher_preferences_20160411}, {
     "20160804", &cipher_preferences_20160804}, {
     "20160824", &cipher_preferences_20160824}, {
+    "FIPS", &cipher_preferences_FIPS}, {
     "test_all", &cipher_preferences_test_all}, {
     NULL, NULL}
 };
