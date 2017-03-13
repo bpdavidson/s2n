@@ -42,8 +42,13 @@ int main(int argc, char **argv)
             }
         }
 
+#ifdef OPENSSL_FIPS
+        /* We should have exactly 11 cipher suites when using FIPS */
+        EXPECT_EQUAL(count, 11);
+#else
         /* We should have exactly 23 cipher suites */
         EXPECT_EQUAL(count, 23);
+#endif
 
         EXPECT_SUCCESS(s2n_connection_free(conn));
     }

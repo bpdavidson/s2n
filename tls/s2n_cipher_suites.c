@@ -396,6 +396,22 @@ struct s2n_cipher_suite s2n_ecdhe_rsa_with_aes_256_gcm_sha384 = /* 0xC0,0x30 */ 
     .minimum_required_tls_version = S2N_TLS12,
 };
 
+#ifdef OPENSSL_FIPS
+/* All of the FIPS cipher suites that s2n negotiates, in order of IANA value */
+struct s2n_cipher_suite *s2n_all_cipher_suites[] = {
+     &s2n_rsa_with_3des_ede_cbc_sha,           /* 0x00,0x0A */
+     &s2n_rsa_with_aes_128_cbc_sha,            /* 0x00,0x2F */
+     &s2n_rsa_with_aes_256_cbc_sha,            /* 0x00,0x35 */
+     &s2n_rsa_with_aes_128_cbc_sha256,         /* 0x00,0x3C */
+     &s2n_rsa_with_aes_256_cbc_sha256,         /* 0x00,0x3D */
+     &s2n_rsa_with_aes_128_gcm_sha256,         /* 0x00,0x9C */
+     &s2n_rsa_with_aes_256_gcm_sha384,         /* 0x00,0x9D */
+     &s2n_ecdhe_rsa_with_aes_128_cbc_sha256,   /* 0xC0,0x27 */
+     &s2n_ecdhe_rsa_with_aes_256_cbc_sha384,   /* 0xC0,0x28 */
+     &s2n_ecdhe_rsa_with_aes_128_gcm_sha256,   /* 0xC0,0x2F */
+     &s2n_ecdhe_rsa_with_aes_256_gcm_sha384,   /* 0xC0,0x30 */
+};
+#else
 /* All of the cipher suites that s2n negotiates, in order of IANA value */
 struct s2n_cipher_suite *s2n_all_cipher_suites[] = {
     &s2n_rsa_with_rc4_128_md5,                /* 0x00,0x04 */
@@ -422,6 +438,7 @@ struct s2n_cipher_suite *s2n_all_cipher_suites[] = {
     &s2n_ecdhe_rsa_with_aes_128_gcm_sha256,   /* 0xC0,0x2F */
     &s2n_ecdhe_rsa_with_aes_256_gcm_sha384,   /* 0xC0,0x30 */
 };
+#endif
 
 /* Determines cipher suite availability and selects record algorithms */
 int s2n_cipher_suites_init(void)

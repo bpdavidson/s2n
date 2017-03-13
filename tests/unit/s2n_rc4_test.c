@@ -41,6 +41,10 @@ int main(int argc, char **argv)
 
     BEGIN_TEST();
 
+#ifdef OPENSSL_FIPS
+    END_TEST();
+#endif
+
     EXPECT_NOT_NULL(conn = s2n_connection_new(S2N_SERVER));
     EXPECT_SUCCESS(s2n_get_urandom_data(&r));
 

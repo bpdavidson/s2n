@@ -224,7 +224,9 @@ int s2n_conn_set_handshake_type(struct s2n_connection *conn)
 
 static int s2n_conn_update_handshake_hashes(struct s2n_connection *conn, struct s2n_blob *data)
 {
+#ifndef OPENSSL_FIPS
     GUARD(s2n_hash_update(&conn->handshake.md5, data->data, data->size));
+#endif    
     GUARD(s2n_hash_update(&conn->handshake.sha1, data->data, data->size));
     GUARD(s2n_hash_update(&conn->handshake.sha224, data->data, data->size));
     GUARD(s2n_hash_update(&conn->handshake.sha256, data->data, data->size));

@@ -211,23 +211,46 @@ struct s2n_cipher_preferences cipher_preferences_FIPS = {
     .minimum_protocol_version = S2N_TLS10
 };
 
-/* All supported ciphers. Only exposed for integration testing. */
-uint8_t wire_format_test_all[] = {
-    TLS_RSA_WITH_RC4_128_MD5, TLS_RSA_WITH_RC4_128_SHA, TLS_RSA_WITH_3DES_EDE_CBC_SHA, TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA,
-    TLS_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_RSA_WITH_AES_128_CBC_SHA, TLS_RSA_WITH_AES_256_CBC_SHA,
-    TLS_DHE_RSA_WITH_AES_256_CBC_SHA, TLS_RSA_WITH_AES_128_CBC_SHA256, TLS_RSA_WITH_AES_256_CBC_SHA256,
-    TLS_DHE_RSA_WITH_AES_128_CBC_SHA256, TLS_DHE_RSA_WITH_AES_256_CBC_SHA256, TLS_RSA_WITH_AES_128_GCM_SHA256,
-    TLS_DHE_RSA_WITH_AES_128_GCM_SHA256, TLS_DHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
-    TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
-    TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-    TLS_RSA_WITH_AES_256_GCM_SHA384
-};
+#ifdef OPENSSL_FIPS
+    /* All supported FIPS ciphers. Only exposed for integration testing. */
+    uint8_t wire_format_test_all[] = {
+        TLS_RSA_WITH_3DES_EDE_CBC_SHA,
+        TLS_RSA_WITH_AES_128_CBC_SHA,
+        TLS_RSA_WITH_AES_256_CBC_SHA,
+        TLS_RSA_WITH_AES_128_CBC_SHA256,
+        TLS_RSA_WITH_AES_256_CBC_SHA256,
+        TLS_RSA_WITH_AES_128_GCM_SHA256,
+        TLS_RSA_WITH_AES_256_GCM_SHA384,
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
+        TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,
+        TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+        TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+    };
 
-struct s2n_cipher_preferences cipher_preferences_test_all = {
-    .count = sizeof(wire_format_test_all),
-    .wire_format = wire_format_test_all,
-    .minimum_protocol_version = S2N_SSLv3
-};
+    struct s2n_cipher_preferences cipher_preferences_test_all = {
+        .count = sizeof(wire_format_test_all),
+        .wire_format = wire_format_test_all,
+        .minimum_protocol_version = S2N_TLS10
+    };
+#else
+    /* All supported ciphers. Only exposed for integration testing. */
+    uint8_t wire_format_test_all[] = {
+        TLS_RSA_WITH_RC4_128_MD5, TLS_RSA_WITH_RC4_128_SHA, TLS_RSA_WITH_3DES_EDE_CBC_SHA, TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA,
+        TLS_RSA_WITH_AES_128_CBC_SHA, TLS_DHE_RSA_WITH_AES_128_CBC_SHA, TLS_RSA_WITH_AES_256_CBC_SHA,
+        TLS_DHE_RSA_WITH_AES_256_CBC_SHA, TLS_RSA_WITH_AES_128_CBC_SHA256, TLS_RSA_WITH_AES_256_CBC_SHA256,
+        TLS_DHE_RSA_WITH_AES_128_CBC_SHA256, TLS_DHE_RSA_WITH_AES_256_CBC_SHA256, TLS_RSA_WITH_AES_128_GCM_SHA256,
+        TLS_DHE_RSA_WITH_AES_128_GCM_SHA256, TLS_DHE_RSA_WITH_AES_256_GCM_SHA384, TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA, TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA, TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,
+        TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+        TLS_RSA_WITH_AES_256_GCM_SHA384
+    };
+
+    struct s2n_cipher_preferences cipher_preferences_test_all = {
+        .count = sizeof(wire_format_test_all),
+        .wire_format = wire_format_test_all,
+        .minimum_protocol_version = S2N_SSLv3
+    };
+#endif
 
 struct {
     const char *version;
@@ -250,7 +273,11 @@ struct {
 
 struct s2n_config s2n_default_config = {
     .cert_and_key_pairs = NULL,
+#ifdef OPENSSL_FIPS
+    .cipher_preferences = &cipher_preferences_FIPS,
+#else
     .cipher_preferences = &cipher_preferences_20160824,
+#endif    
     .nanoseconds_since_epoch = get_nanoseconds_since_epoch,
 };
 
@@ -276,7 +303,11 @@ struct s2n_config *s2n_config_new(void)
     new_config->cache_delete_data = NULL;
     new_config->ct_type = S2N_CT_SUPPORT_NONE;
 
+#ifdef OPENSSL_FIPS
+    GUARD_PTR(s2n_config_set_cipher_preferences(new_config, "FIPS"));
+#else
     GUARD_PTR(s2n_config_set_cipher_preferences(new_config, "default"));
+#endif
 
     return new_config;
 }

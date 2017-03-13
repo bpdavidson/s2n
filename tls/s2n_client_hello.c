@@ -78,7 +78,11 @@ int s2n_client_hello_recv(struct s2n_connection *conn)
     conn->secure.server_ecc_params.negotiated_curve = &s2n_ecc_supported_curves[0];
 
     /* Default our signature digest algorithms */
+#ifdef OPENSSL_FIPS
+    conn->secure.signature_digest_alg = S2N_HASH_SHA1;
+#else
     conn->secure.signature_digest_alg = S2N_HASH_MD5_SHA1;
+#endif    
     if (conn->actual_protocol_version == S2N_TLS12) {
         conn->secure.signature_digest_alg = S2N_HASH_SHA1;
     }
@@ -148,7 +152,11 @@ int s2n_client_hello_send(struct s2n_connection *conn)
     GUARD(s2n_client_extensions_send(conn, out));
 
     /* Default our signature digest algorithm to SHA1. Will be used when verifying a client certificate. */
+#ifdef OPENSSL_FIPS
+    conn->secure.signature_digest_alg = S2N_HASH_SHA1;
+#else
     conn->secure.signature_digest_alg = S2N_HASH_MD5_SHA1;
+#endif
     if (conn->actual_protocol_version == S2N_TLS12) {
         conn->secure.signature_digest_alg = S2N_HASH_SHA1;
     }

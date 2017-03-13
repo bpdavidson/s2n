@@ -25,11 +25,9 @@
 int main(int argc, char **argv)
 {
     uint8_t digest_pad[256];
-    uint8_t check_pad[256];
     uint8_t output_pad[256];
     struct s2n_stuffer output;
     uint8_t sekrit[] = "sekrit";
-    uint8_t longsekrit[] = "This is a really really really long key on purpose to make sure that it's longer than the block size";
     uint8_t hello[] = "Hello world!";
     uint8_t string1[] = "String 1";
     uint8_t string2[] = "and String 2";
@@ -39,6 +37,7 @@ int main(int argc, char **argv)
 
     BEGIN_TEST();
 
+#ifndef OPENSSL_FIPS
     /* Try MD5 */
     uint8_t hmac_md5_size;
     GUARD(s2n_hmac_digest_size(S2N_HMAC_MD5, &hmac_md5_size));
@@ -54,6 +53,7 @@ int main(int argc, char **argv)
 
     /* Reference value from python */
     EXPECT_EQUAL(memcmp(output_pad, "3ad68c53dc1a3cf35f6469877fae4585", 16 * 2), 0);
+#endif
 
     /* Try SHA1 */
     uint8_t hmac_sha1_size;
@@ -196,6 +196,7 @@ int main(int argc, char **argv)
     /* Reference value from python */
     EXPECT_EQUAL(memcmp(output_pad, "0a834a1ed265042e2897405edb4fdd9818950cd5bea10b828f2fed45a1cb6dbd2107e4b04eb20f211998cd4e8c7e11ebdcb0103ac63882481e1bb8083d07f4be", 64 * 2), 0);
 
+#ifndef OPENSSL_FIPS
     /* Try SSLv3 MD5 */
     uint8_t hmac_sslv3_md5_size;
     GUARD(s2n_hmac_digest_size(S2N_HMAC_SSLv3_MD5, &hmac_sslv3_md5_size));
@@ -224,7 +225,7 @@ int main(int argc, char **argv)
 
     /* Reference value from Go */
     EXPECT_EQUAL(memcmp(output_pad, "d4f0d06b9765de23e6c3e33a24c5ded0", 16 * 2), 0);
-
+    
     /* Try SSLv3 SHA1 */
     uint8_t hmac_sslv3_sha1_size;
     GUARD(s2n_hmac_digest_size(S2N_HMAC_SSLv3_SHA1, &hmac_sslv3_sha1_size));
@@ -255,6 +256,7 @@ int main(int argc, char **argv)
 
     /* Reference value from Go */
     EXPECT_EQUAL(memcmp(output_pad, "b0c66179f6eb5a46b4b7c4fca84b3ea5161b7326", 20 * 2), 0);
+#endif
 
     END_TEST();
 }

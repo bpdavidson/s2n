@@ -53,8 +53,13 @@ static uint8_t server_hello_message[] = {
     /* Session ID */
     ZERO_TO_THIRTY_ONE,
 
+#ifdef OPENSSL_FIPS
+    /* FIPS Cipher suite - TLS_RSA_WITH_AES_256_CBC_SHA256 */
+    0x00, 0x3D,
+#else
     /* Cipher suite - TLS_RSA_WITH_RC4_128_SHA */
     0x00, 0x05,
+#endif
 
     /* Compression method: none  */
     0x00

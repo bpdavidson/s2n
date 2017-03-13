@@ -31,11 +31,12 @@ int main(int argc, char **argv)
     uint8_t string1[] = "String 1\n";
     uint8_t string2[] = "and String 2\n";
     struct s2n_stuffer output;
-    struct s2n_hash_state hash, copy;
+    struct s2n_hash_state hash;
     struct s2n_blob out = {.data = output_pad,.size = sizeof(output_pad) };
 
     BEGIN_TEST();
 
+#ifndef OPENSSL_FIPS
     /* Try MD5 */
     uint8_t md5_digest_size;
     GUARD(s2n_hash_digest_size(S2N_HASH_MD5, &md5_digest_size));
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
 
     /* Reference value from command line md5sum */
     EXPECT_EQUAL(memcmp(output_pad, "59ca0efa9f5633cb0371bbc0355478d8", 16 * 2), 0);
+#endif
 
     /* Try SHA1 */
     uint8_t sha1_digest_size;
