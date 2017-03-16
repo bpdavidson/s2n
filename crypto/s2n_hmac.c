@@ -244,6 +244,15 @@ int s2n_hmac_digest_two_compression_rounds(struct s2n_hmac_state *state, void *o
     return s2n_hash_update(&state->inner, state->xor_pad, state->hash_block_size);
 }
 
+int s2n_hmac_free(struct s2n_hmac_state *state)
+{
+    s2n_hash_free(&state->inner);
+    s2n_hash_free(&state->inner_just_key);
+    s2n_hash_free(&state->outer);
+
+    return 0;
+}
+
 int s2n_hmac_reset(struct s2n_hmac_state *state)
 {
     state->currently_in_hash_block = 0;

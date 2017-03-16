@@ -204,6 +204,9 @@ int s2n_connection_free(struct s2n_connection *conn)
     GUARD(s2n_hash_free(&conn->handshake.sha256));
     GUARD(s2n_hash_free(&conn->handshake.sha384)); 
 
+    GUARD(s2n_hmac_free(&conn->client->client_record_mac));
+    GUARD(s2n_hmac_free(&conn->server->server_record_mac));
+
     GUARD(s2n_free(&conn->status_response));
     GUARD(s2n_stuffer_free(&conn->in));
     GUARD(s2n_stuffer_free(&conn->out));

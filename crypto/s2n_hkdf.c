@@ -38,6 +38,8 @@ int s2n_hkdf_extract(s2n_hmac_algorithm alg, const struct s2n_blob *salt, const 
     GUARD(s2n_hmac_update(&hmac, key->data, key->size));
     GUARD(s2n_hmac_digest(&hmac, pseudo_rand_key->data, pseudo_rand_key->size));
 
+    GUARD(s2n_hmac_free(&hmac));
+
     return 0;
 }
 
@@ -78,6 +80,8 @@ static int s2n_hkdf_expand(s2n_hmac_algorithm alg, const struct s2n_blob *pseudo
 
         done_len += cat_len;
     }
+
+    GUARD(s2n_hmac_free(&hmac));
 
     return 0;
 }
