@@ -54,10 +54,10 @@ typedef enum {
 struct s2n_hash_state {
     s2n_hash_algorithm alg;
     union {
-        EVP_MD_CTX mdctx;
+        EVP_MD_CTX *mdctx;
         struct {
-            EVP_MD_CTX md5_ctx;
-            EVP_MD_CTX sha1_ctx;
+            EVP_MD_CTX *md5_ctx;
+            EVP_MD_CTX *sha1_ctx;
         } md5_sha1;
     } hash_ctx;
 };
@@ -69,3 +69,4 @@ extern int s2n_hash_update(struct s2n_hash_state *state, const void *in, uint32_
 extern int s2n_hash_digest(struct s2n_hash_state *state, void *out, uint32_t size);
 extern int s2n_hash_reset(struct s2n_hash_state *state);
 extern int s2n_hash_copy(struct s2n_hash_state *to, struct s2n_hash_state *from);
+
