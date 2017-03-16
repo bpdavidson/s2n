@@ -197,6 +197,13 @@ int s2n_connection_free(struct s2n_connection *conn)
     GUARD(s2n_connection_wipe_keys(conn));
     GUARD(s2n_connection_free_keys(conn));
 
+#ifndef OPENSSL_FIPS
+    GUARD(s2n_hash_free(&conn->handshake.md5));
+#endif
+    GUARD(s2n_hash_free(&conn->handshake.sha1));
+    GUARD(s2n_hash_free(&conn->handshake.sha256));
+    GUARD(s2n_hash_free(&conn->handshake.sha384)); 
+
     GUARD(s2n_free(&conn->status_response));
     GUARD(s2n_stuffer_free(&conn->in));
     GUARD(s2n_stuffer_free(&conn->out));

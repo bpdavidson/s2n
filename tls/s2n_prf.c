@@ -74,6 +74,9 @@ static int s2n_sslv3_prf(union s2n_prf_working_space *ws, struct s2n_blob *secre
         A++;
         iteration++;
     }
+    
+    s2n_hash_free(md5);
+    s2n_hash_free(sha1);
 
     return 0;
 }

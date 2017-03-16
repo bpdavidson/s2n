@@ -204,7 +204,7 @@ int s2n_hash_digest(struct s2n_hash_state *state, void *out, uint32_t size)
     return 0;
 }
 
-int s2n_hash_reset(struct s2n_hash_state *state)
+int s2n_hash_free(struct s2n_hash_state *state)
 {
     switch (state->alg) {
     case S2N_HASH_NONE:
@@ -232,6 +232,13 @@ int s2n_hash_reset(struct s2n_hash_state *state)
     default:
         S2N_ERROR(S2N_ERR_HASH_INVALID_ALGORITHM);
     }
+    
+    return 0;
+}
+
+int s2n_hash_reset(struct s2n_hash_state *state)
+{
+    s2n_hash_free(state);
 
     return s2n_hash_init(state, state->alg);
 }

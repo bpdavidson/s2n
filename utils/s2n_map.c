@@ -60,6 +60,8 @@ static uint32_t s2n_map_slot(struct s2n_map *map, struct s2n_blob *key)
     GUARD(s2n_hash_update(&sha256, key->data, key->size));
     GUARD(s2n_hash_digest(&sha256, digest.u8, sizeof(digest)));
 
+    s2n_hash_free(&sha256);
+
     return digest.u32[0] % map->capacity;
 }
 
