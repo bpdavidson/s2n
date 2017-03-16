@@ -230,6 +230,11 @@ int main(int argc, char **argv)
     EXPECT_SUCCESS(s2n_rsa_sign(&priv_key, &tls12_one, &signature));
     EXPECT_SUCCESS(s2n_rsa_verify(&pub_key, &tls12_two, &signature));
 
+    EXPECT_SUCCESS(s2n_hash_free(&tls10_one));
+    EXPECT_SUCCESS(s2n_hash_free(&tls10_two));
+    EXPECT_SUCCESS(s2n_hash_free(&tls12_one));
+    EXPECT_SUCCESS(s2n_hash_free(&tls12_two));
+
     EXPECT_SUCCESS(s2n_config_free(config));
 
     /* Mismatched public/private key should fail */

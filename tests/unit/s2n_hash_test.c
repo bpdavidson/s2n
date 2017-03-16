@@ -54,6 +54,8 @@ int main(int argc, char **argv)
     /* Check the copy */
     EXPECT_SUCCESS(s2n_hash_digest(&copy, digest_pad, MD5_DIGEST_LENGTH));
 
+    EXPECT_SUCCESS(s2n_hash_free(&copy));
+
     for (int i = 0; i < 16; i++) {
         EXPECT_SUCCESS(s2n_stuffer_write_uint8_hex(&output, digest_pad[i]));
     }
@@ -98,6 +100,8 @@ int main(int argc, char **argv)
     EXPECT_SUCCESS(s2n_hash_init(&hash, S2N_HASH_SHA384));
     EXPECT_SUCCESS(s2n_hash_update(&hash, hello, strlen((char *)hello)));
     EXPECT_SUCCESS(s2n_hash_digest(&hash, digest_pad, SHA384_DIGEST_LENGTH));
+
+    EXPECT_SUCCESS(s2n_hash_free(&hash));
 
     for (int i = 0; i < 48; i++) {
         EXPECT_SUCCESS(s2n_stuffer_write_uint8_hex(&output, digest_pad[i]));

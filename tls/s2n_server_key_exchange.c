@@ -192,6 +192,8 @@ static int s2n_dhe_server_key_recv(struct s2n_connection *conn)
         S2N_ERROR(S2N_ERR_BAD_MESSAGE);
     }
 
+    GUARD(s2n_hash_free(&signature_hash));
+
     /* We don't need the key any more, so free it */
     GUARD(s2n_rsa_public_key_free(&conn->secure.server_rsa_public_key));
 
@@ -246,6 +248,8 @@ static int s2n_ecdhe_server_key_send(struct s2n_connection *conn)
         S2N_ERROR(S2N_ERR_DH_FAILED_SIGNING);
     }
 
+    GUARD(s2n_hash_free(&signature_hash));
+
     return 0;
 }
 
@@ -283,6 +287,8 @@ static int s2n_dhe_server_key_send(struct s2n_connection *conn)
     if (s2n_rsa_sign(&conn->config->cert_and_key_pairs->private_key, &signature_hash, &signature) < 0) {
         S2N_ERROR(S2N_ERR_DH_FAILED_SIGNING);
     }
+
+    GUARD(s2n_hash_free(&signature_hash));
 
     return 0;
 }

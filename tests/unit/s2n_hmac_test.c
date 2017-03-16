@@ -58,6 +58,8 @@ int main(int argc, char **argv)
     /* Check the copy */
     EXPECT_SUCCESS(s2n_hmac_digest(&copy, digest_pad, 16));
 
+    EXPECT_SUCCESS(s2n_hmac_free(&copy));
+    
     for (int i = 0; i < 16; i++) {
         EXPECT_SUCCESS(s2n_stuffer_write_uint8_hex(&output, digest_pad[i]));
     }
@@ -222,6 +224,8 @@ int main(int argc, char **argv)
     EXPECT_SUCCESS(s2n_hmac_update(&hmac, hello, strlen((char *)hello)));
     EXPECT_SUCCESS(s2n_hmac_digest(&hmac, digest_pad, 20));
 
+    EXPECT_SUCCESS(s2n_hmac_free(&hmac));
+    
     EXPECT_SUCCESS(s2n_stuffer_init(&output, &out));
     for (int i = 0; i < 20; i++) {
         EXPECT_SUCCESS(s2n_stuffer_write_uint8_hex(&output, digest_pad[i]));
