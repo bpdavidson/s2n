@@ -16,6 +16,7 @@
 #include "error/s2n_errno.h"
 
 #include "crypto/s2n_hash.h"
+#include "crypto/s2n_openssl.h"
 
 #include "utils/s2n_safety.h"
 
@@ -44,32 +45,61 @@ int s2n_hash_init(struct s2n_hash_state *state, s2n_hash_algorithm alg)
         r = 1;
         break;
     case S2N_HASH_MD5:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.mdctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.mdctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.mdctx, EVP_md5(), NULL);
         break;
     case S2N_HASH_SHA1:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.mdctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.mdctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.mdctx, EVP_sha1(), NULL);
         break;
     case S2N_HASH_SHA224:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.mdctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.mdctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.mdctx, EVP_sha224(), NULL);
         break;
     case S2N_HASH_SHA256:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.mdctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.mdctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.mdctx, EVP_sha256(), NULL);
         break;
     case S2N_HASH_SHA384:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.mdctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.mdctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.mdctx, EVP_sha384(), NULL);
         break;
     case S2N_HASH_SHA512:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.mdctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.mdctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.mdctx, EVP_sha512(), NULL);
         break;
     case S2N_HASH_MD5_SHA1:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        state->hash_ctx.md5_sha1.sha1_ctx = EVP_MD_CTX_new();
+        state->hash_ctx.md5_sha1.md5_ctx = EVP_MD_CTX_new();
+#else
         state->hash_ctx.md5_sha1.sha1_ctx = EVP_MD_CTX_create();
         state->hash_ctx.md5_sha1.md5_ctx = EVP_MD_CTX_create();
+#endif
         r = EVP_DigestInit_ex(state->hash_ctx.md5_sha1.sha1_ctx, EVP_sha1(), NULL);
         r &= EVP_DigestInit_ex(state->hash_ctx.md5_sha1.md5_ctx, EVP_md5(), NULL);
         break;
@@ -184,11 +214,20 @@ int s2n_hash_reset(struct s2n_hash_state *state)
     case S2N_HASH_SHA256:
     case S2N_HASH_SHA384:
     case S2N_HASH_SHA512:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        EVP_MD_CTX_free(state->hash_ctx.mdctx);
+#else
         EVP_MD_CTX_destroy(state->hash_ctx.mdctx);
+#endif
         break;
     case S2N_HASH_MD5_SHA1:
+#if S2N_OPENSSL_VERSION_AT_LEAST(1,1,0) && !defined(LIBRESSL_VERSION_NUMBER)
+        EVP_MD_CTX_free(state->hash_ctx.md5_sha1.sha1_ctx);
+        EVP_MD_CTX_free(state->hash_ctx.md5_sha1.md5_ctx);
+#else
         EVP_MD_CTX_destroy(state->hash_ctx.md5_sha1.sha1_ctx);
         EVP_MD_CTX_destroy(state->hash_ctx.md5_sha1.md5_ctx);
+#endif
         break;
     default:
         S2N_ERROR(S2N_ERR_HASH_INVALID_ALGORITHM);
