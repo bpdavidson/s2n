@@ -85,7 +85,7 @@ static int s2n_sslv3_prf(union s2n_prf_working_space *ws, struct s2n_blob *secre
 static int s2n_p_hash(union s2n_prf_working_space *ws, s2n_hmac_algorithm alg, struct s2n_blob *secret,
                       struct s2n_blob *label, struct s2n_blob *seed_a, struct s2n_blob *seed_b, struct s2n_blob *out)
 {
-    const EVP_MD *md = &ws->tls.md;
+    const EVP_MD *md = ws->tls.md;
 
     switch (alg) {
     case S2N_HMAC_SSLv3_MD5:
