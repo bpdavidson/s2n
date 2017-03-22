@@ -32,9 +32,10 @@
 
 #include <openssl/md5.h>
 #include <openssl/sha.h>
-#include <openssl/evp.h>
 
 #endif
+
+#include <openssl/evp.h>
 
 #include <stdint.h>
 
