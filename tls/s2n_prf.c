@@ -347,7 +347,7 @@ int s2n_prf_server_finished(struct s2n_connection *conn)
 
         sha.data = sha_digest;
         result = s2n_prf(conn, &master_secret, &label, &sha, NULL, &server_finished);
-        s2n_hash_free(&sha1_state);
+        s2n_hash_free(&hash_state);
         return result;
     }
 

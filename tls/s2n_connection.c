@@ -212,12 +212,12 @@ int s2n_connection_free(struct s2n_connection *conn)
 
     if (conn->actual_protocol_version == S2N_SSLv3)
     {
-        GUARD(s2n_hash_free(&conn->prf_space->ssl3.md5));
-        GUARD(s2n_hash_free(&conn->prf_space->ssl3.sha1));
+        GUARD(s2n_hash_free(&conn->prf_space.ssl3.md5));
+        GUARD(s2n_hash_free(&conn->prf_space.ssl3.sha1));
     }
     else
     {
-        GUARD(s2n_hmac_free(conn->prf_space->tls.hmac));
+        GUARD(s2n_hmac_free(&conn->prf_space.tls.hmac));
     }
 
     GUARD(s2n_free(&conn->status_response));
