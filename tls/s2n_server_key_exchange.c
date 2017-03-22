@@ -108,7 +108,7 @@ static int s2n_ecdhe_server_key_recv(struct s2n_connection *conn)
         S2N_ERROR(S2N_ERR_BAD_MESSAGE);
     }
 
-    s2n_hash_free(&signature_hash);
+    GUARD(s2n_hash_free(&signature_hash));
 
     /* We don't need the key any more, so free it */
     GUARD(s2n_rsa_public_key_free(&conn->secure.server_rsa_public_key));
@@ -292,3 +292,4 @@ static int s2n_dhe_server_key_send(struct s2n_connection *conn)
 
     return 0;
 }
+

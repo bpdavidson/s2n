@@ -201,11 +201,24 @@ int s2n_connection_free(struct s2n_connection *conn)
     GUARD(s2n_hash_free(&conn->handshake.md5));
 #endif
     GUARD(s2n_hash_free(&conn->handshake.sha1));
+    GUARD(s2n_hash_free(&conn->handshake.sha224));
     GUARD(s2n_hash_free(&conn->handshake.sha256));
     GUARD(s2n_hash_free(&conn->handshake.sha384)); 
+    GUARD(s2n_hash_free(&conn->handshake.sha512));
 
     GUARD(s2n_hmac_free(&conn->client->client_record_mac));
     GUARD(s2n_hmac_free(&conn->server->server_record_mac));
+
+
+    if (conn->actual_protocol_version == S2N_SSLv3)
+    {
+        GUARD(s2n_hash_free(&conn->prf_space->ssl3.md5));
+        GUARD(s2n_hash_free(&conn->prf_space->ssl3.sha1));
+    }
+    else
+    {
+        GUARD(s2n_hmac_free(conn->prf_space->tls.hmac));
+    }
 
     GUARD(s2n_free(&conn->status_response));
     GUARD(s2n_stuffer_free(&conn->in));
@@ -661,3 +674,4 @@ const uint8_t *s2n_connection_get_sct_list(struct s2n_connection *conn, uint32_t
     *length = conn->ct_response.size;
     return conn->ct_response.data;
 }
+

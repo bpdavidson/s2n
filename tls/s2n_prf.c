@@ -220,22 +220,30 @@ static int s2n_sslv3_client_finished(struct s2n_connection *conn)
 {
     uint8_t prefix[4] = { 0x43, 0x4c, 0x4e, 0x54 };
     struct s2n_hash_state md5, sha1;
+    int result;
 
     lte_check(MD5_DIGEST_LENGTH + SHA_DIGEST_LENGTH, sizeof(conn->handshake.client_finished));
     GUARD(s2n_hash_copy(&md5, &conn->handshake.md5));
     GUARD(s2n_hash_copy(&sha1, &conn->handshake.sha1));
-    return s2n_sslv3_finished(conn, prefix, &md5, &sha1, conn->handshake.client_finished);
+    result = s2n_sslv3_finished(conn, prefix, &md5, &sha1, conn->handshake.client_finished);
+    s2n_hash_free(&md5);
+    s2n_hash_free(&sha1);
+    return result;
 }
 
 static int s2n_sslv3_server_finished(struct s2n_connection *conn)
 {
     uint8_t prefix[4] = { 0x53, 0x52, 0x56, 0x52 };
     struct s2n_hash_state md5, sha1;
+    int result;
 
     lte_check(MD5_DIGEST_LENGTH + SHA_DIGEST_LENGTH, sizeof(conn->handshake.server_finished));
     GUARD(s2n_hash_copy(&md5, &conn->handshake.md5));
     GUARD(s2n_hash_copy(&sha1, &conn->handshake.sha1));
-    return s2n_sslv3_finished(conn, prefix, &md5, &sha1, conn->handshake.server_finished);
+    result =  s2n_sslv3_finished(conn, prefix, &md5, &sha1, conn->handshake.server_finished);
+    s2n_hash_free(&md5);
+    s2n_hash_free(&sha1);
+    return result;
 }
 
 int s2n_prf_client_finished(struct s2n_connection *conn)
@@ -246,6 +254,7 @@ int s2n_prf_client_finished(struct s2n_connection *conn)
     uint8_t client_finished_label[] = "client finished";
     struct s2n_blob client_finished;
     struct s2n_blob label;
+    int result;
 
     if (conn->actual_protocol_version == S2N_SSLv3) {
         return s2n_sslv3_client_finished(conn);
@@ -276,7 +285,9 @@ int s2n_prf_client_finished(struct s2n_connection *conn)
         }
 
         sha.data = sha_digest;
-        return s2n_prf(conn, &master_secret, &label, &sha, NULL, &client_finished);
+        result = s2n_prf(conn, &master_secret, &label, &sha, NULL, &client_finished);
+        s2n_hash_free(&hash_state);
+        return result;
     }
 
     struct s2n_hash_state md5_state, sha1_state;
@@ -290,7 +301,10 @@ int s2n_prf_client_finished(struct s2n_connection *conn)
     sha.data = sha_digest;
     sha.size = SHA_DIGEST_LENGTH;
 
-    return s2n_prf(conn, &master_secret, &label, &md5, &sha, &client_finished);
+    result = s2n_prf(conn, &master_secret, &label, &md5, &sha, &client_finished);
+    s2n_hash_free(&md5_state);
+    s2n_hash_free(&sha1_state);
+    return result;
 }
 
 int s2n_prf_server_finished(struct s2n_connection *conn)
@@ -301,6 +315,7 @@ int s2n_prf_server_finished(struct s2n_connection *conn)
     uint8_t server_finished_label[] = "server finished";
     struct s2n_blob server_finished;
     struct s2n_blob label;
+    int result;
 
     if (conn->actual_protocol_version == S2N_SSLv3) {
         return s2n_sslv3_server_finished(conn);
@@ -331,7 +346,9 @@ int s2n_prf_server_finished(struct s2n_connection *conn)
         }
 
         sha.data = sha_digest;
-        return s2n_prf(conn, &master_secret, &label, &sha, NULL, &server_finished);
+        result = s2n_prf(conn, &master_secret, &label, &sha, NULL, &server_finished);
+        s2n_hash_free(&sha1_state);
+        return result;
     }
 
     struct s2n_hash_state md5_state, sha1_state;
@@ -345,7 +362,10 @@ int s2n_prf_server_finished(struct s2n_connection *conn)
     sha.data = sha_digest;
     sha.size = SHA_DIGEST_LENGTH;
 
-    return s2n_prf(conn, &master_secret, &label, &md5, &sha, &server_finished);
+    result = s2n_prf(conn, &master_secret, &label, &md5, &sha, &server_finished);
+    s2n_hash_free(&md5_state);
+    s2n_hash_free(&sha1_state);
+    return result;
 }
 
 int s2n_prf_key_expansion(struct s2n_connection *conn)
@@ -459,3 +479,4 @@ int s2n_prf_key_expansion(struct s2n_connection *conn)
 
     return 0;
 }
+
