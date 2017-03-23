@@ -111,6 +111,8 @@ int main(int argc, char **argv)
     EXPECT_SUCCESS(s2n_hmac_digest(&cmac, check_pad, 16));
     EXPECT_SUCCESS(s2n_hmac_digest_verify(digest_pad, check_pad, 16));
 
+    EXPECT_SUCCESS(s2n_hmac_free(&cmac));
+
     /* Try SHA1 */
     uint8_t hmac_sha1_size;
     GUARD(s2n_hmac_digest_size(S2N_HMAC_SHA1, &hmac_sha1_size));
@@ -235,3 +237,4 @@ int main(int argc, char **argv)
 
     END_TEST();
 }
+

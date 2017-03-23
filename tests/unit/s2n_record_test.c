@@ -349,7 +349,10 @@ int main(int argc, char **argv)
     /* Sequence number should wrap around */
     EXPECT_FAILURE(s2n_record_write(conn, TLS_APPLICATION_DATA, &empty_blob));
 
+    EXPECT_SUCCESS(s2n_hmac_free(&check_mac));
+
     EXPECT_SUCCESS(s2n_connection_free(conn));
 
     END_TEST();
 }
+

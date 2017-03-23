@@ -268,7 +268,11 @@ int main(int argc, char **argv)
             FAIL();
         }
     }
+
+    EXPECT_SUCCESS(s2n_hmac_free(&check_mac));
+    EXPECT_SUCCESS(s2n_hmac_free(&record_mac));
     EXPECT_SUCCESS(s2n_connection_free(conn));
 
     END_TEST();
 }
+
