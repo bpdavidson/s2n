@@ -25,9 +25,11 @@
 int main(int argc, char **argv)
 {
     uint8_t digest_pad[256];
+    uint8_t check_pad[256];
     uint8_t output_pad[256];
     struct s2n_stuffer output;
     uint8_t sekrit[] = "sekrit";
+    uint8_t longsekrit[] = "This is a really really really long key on purpose to make sure that it's longer than the block size";
     uint8_t hello[] = "Hello world!";
     uint8_t string1[] = "String 1";
     uint8_t string2[] = "and String 2";
@@ -71,7 +73,6 @@ int main(int argc, char **argv)
 
     /* Reference value from python */
     EXPECT_EQUAL(memcmp(output_pad, "6d301861b599938eca94f6de917362886d97882f", 20 * 2), 0);
-
 
     /* Check the copy */
     EXPECT_SUCCESS(s2n_hmac_digest(&copy, digest_pad, 20));
@@ -225,7 +226,7 @@ int main(int argc, char **argv)
 
     /* Reference value from Go */
     EXPECT_EQUAL(memcmp(output_pad, "d4f0d06b9765de23e6c3e33a24c5ded0", 16 * 2), 0);
-    
+
     /* Try SSLv3 SHA1 */
     uint8_t hmac_sslv3_sha1_size;
     GUARD(s2n_hmac_digest_size(S2N_HMAC_SSLv3_SHA1, &hmac_sslv3_sha1_size));
