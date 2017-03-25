@@ -20,6 +20,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <openssl/crypto.h>
+
 #include "error/s2n_errno.h"
 
 /**
@@ -28,7 +30,11 @@
  *
  */
 
+#ifdef OPENSSL_FIPS
+#define BEGIN_TEST() int test_count = 0; EXPECT_SUCCESS(FIPS_mode_set(1)); EXPECT_SUCCESS(s2n_init()); { fprintf(stdout, "Running FIPS test %-50s ... ", __FILE__); }
+#else
 #define BEGIN_TEST() int test_count = 0; EXPECT_SUCCESS(s2n_init()); { fprintf(stdout, "Running %-50s ... ", __FILE__); }
+#endif
 #define END_TEST()   EXPECT_SUCCESS(s2n_cleanup()); { if (isatty(fileno(stdout))) { \
                             if (test_count) { \
                                 fprintf(stdout, "\033[32;1mPASSED\033[0m %10d tests\n", test_count ); \
