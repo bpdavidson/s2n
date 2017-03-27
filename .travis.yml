@@ -24,6 +24,8 @@ os:
   - osx
   - linux
 
+sudo: required
+
 env:
   - S2N_LIBCRYPTO=openssl-1.1.0 BUILD_S2N=true TESTS=integration
   - S2N_LIBCRYPTO=openssl-1.0.2 BUILD_S2N=true TESTS=integration
