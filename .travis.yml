@@ -102,7 +102,7 @@ install:
   # Download and Install Openssl 1.1.0
   - if [[ ! -d "$OPENSSL_1_1_0_INSTALL_DIR" ]]; then .travis/install_openssl_1_1_0.sh `mktemp -d` $OPENSSL_1_1_0_INSTALL_DIR $TRAVIS_OS_NAME > /dev/null ; fi
   - if [[ ! -d "$OPENSSL_1_0_2_INSTALL_DIR" ]]; then .travis/install_openssl_1_0_2.sh `mktemp -d` $OPENSSL_1_0_2_INSTALL_DIR $TRAVIS_OS_NAME > /dev/null ; fi
-  - if [[ ! -d "$OPENSSL_1_0_2_FIPS_INSTALL_DIR" ]]; then .travis/install_openssl_1_0_2-fips.sh `mktemp -d` $OPENSSL_1_0_2_FIPS_INSTALL_DIR $TRAVIS_OS_NAME > /dev/null ; fi
+  - if [[ ! -d "$OPENSSL_1_0_2_FIPS_INSTALL_DIR" ]]; then .travis/install_openssl_1_0_2_fips.sh `mktemp -d` $OPENSSL_1_0_2_FIPS_INSTALL_DIR $TRAVIS_OS_NAME > /dev/null ; fi
   - if [[ ! -d "$CPPCHECK_INSTALL_DIR" ]]; then mkdir -p $CPPCHECK_INSTALL_DIR && .travis/install_cppcheck.sh $CPPCHECK_INSTALL_DIR > /dev/null ; fi
   - if [[ ! -d "$LIBRESSL_INSTALL_DIR" ]]; then .travis/install_libressl.sh `mktemp -d` $LIBRESSL_INSTALL_DIR > /dev/null ; fi
   # Install python linked with the latest Openssl for integration tests
