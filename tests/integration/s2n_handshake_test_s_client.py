@@ -144,7 +144,7 @@ def handshake_test(host, port):
             cipher_vers = cipher.min_tls_vers
 
             # Skip the cipher if FIPS can't test it.
-            if not cipher.openssl-fips-compatible:
+            if not cipher.openssl_fips_compatible:
                 continue
 
             # Skip the cipher if openssl can't test it. 3DES/RC4 are disabled by default in 1.1.0
@@ -174,13 +174,17 @@ def resume_test(host, port):
             cipher_name = cipher.openssl_name
             cipher_vers = cipher.min_tls_vers
 
+            # Skip the cipher if FIPS can't test it.
+            if not cipher.openssl_fips_compatible:
+                continue
+
             # Skip the cipher if openssl can't test it. 3DES/RC4 are disabled by default in 1.1.0
             if not cipher.openssl_1_1_0_compatible:
                 continue
 
             if ssl_version < cipher_vers:
                 continue
-
+            
             ret = try_handshake(host, port, cipher_name, ssl_version, resume=True)
             result_prefix = "Cipher: %-30s Vers: %-10s ... " % (cipher_name, S2N_PROTO_VERS_TO_STR[ssl_version])
             print_result(result_prefix, ret)

@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <getopt.h>
 
+#include <openssl/crypto.h>
+#include <openssl/err.h>
+
 #include <errno.h>
 
 #include <s2n.h>
@@ -61,6 +64,8 @@ int main(int argc, char *const *argv)
 {
     struct addrinfo hints, *ai_list, *ai;
     int r, sockfd = 0;
+    unsigned long fips_rc = 0;
+    char ssl_error_buf[256]; // Openssl claims you need no more than 120 bytes for error strings
     /* Optional args */
     const char *alpn_protocols = NULL;
     const char *server_name = NULL;
@@ -160,6 +165,14 @@ int main(int argc, char *const *argv)
         close(sockfd);
         exit(1);
     }
+    
+#ifdef OPENSSL_FIPS
+    if (FIPS_mode_set(1) == 0) {
+        fips_rc = ERR_get_error();
+        fprintf(stderr, "s2nc failed to enter FIPS mode with RC: %lu; String: %s\n", fips_rc, ERR_error_string(fips_rc, ssl_error_buf));
+    }
+    printf("s2nc entered FIPS mode\n");
+#endif
 
     if (s2n_init() < 0) {
         fprintf(stderr, "Error running s2n_init(): '%s'\n", s2n_strerror(s2n_errno, "EN"));

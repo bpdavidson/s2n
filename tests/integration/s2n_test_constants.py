@@ -21,7 +21,7 @@ S2N_TLS11 = 32
 S2N_TLS12 = 33
 
 # namedtuple makes iterating through ciphers across libraries easier.
-S2N_CIPHER = collections.namedtuple('S2N_CIPHER', 'openssl_name gnutls_priority_str min_tls_vers openssl_1_1_0_compatible openssl-fips-compatible')
+S2N_CIPHER = collections.namedtuple('S2N_CIPHER', 'openssl_name gnutls_priority_str min_tls_vers openssl_1_1_0_compatible openssl_fips_compatible')
 
 # Specifying a single cipher suite in GnuTLS requires specifying a "priority string" that removes all cipher suites,
 # and then adds each algorithm(kx,auth,enc,mac) for a given suite. See https://www.gnutls.org/manual/html_node/Priority-Strings.html
