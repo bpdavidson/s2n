@@ -143,6 +143,10 @@ def handshake_test(host, port):
             cipher_name = cipher.openssl_name
             cipher_vers = cipher.min_tls_vers
 
+            # Skip the cipher if FIPS can't test it.
+            if not cipher.openssl-fips-compatible:
+                continue
+
             # Skip the cipher if openssl can't test it. 3DES/RC4 are disabled by default in 1.1.0
             if not cipher.openssl_1_1_0_compatible:
                 continue
