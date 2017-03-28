@@ -1,3 +1,4 @@
+sudo: true
 language: c
 cache:
     directories:
@@ -22,8 +23,6 @@ osx_image: xcode8
 os:
   - osx
   - linux
-
-sudo: required
 
 env:
   - S2N_LIBCRYPTO=openssl-1.1.0 BUILD_S2N=true TESTS=integration
