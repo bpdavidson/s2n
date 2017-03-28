@@ -255,8 +255,6 @@ int main(int argc, char *const *argv)
 {
     struct addrinfo hints, *ai;
     int r, sockfd = 0;
-    unsigned long fips_rc = 0;
-    char ssl_error_buf[256]; // Openssl claims you need no more than 120 bytes for error strings
     s2n_tls_extension sct_ext = { .type = S2N_EXTENSION_CERTIFICATE_TRANSPARENCY,
                                   .length = sizeof(sct_list), .data = sct_list };
 
@@ -371,7 +369,8 @@ int main(int argc, char *const *argv)
 
 #ifdef OPENSSL_FIPS
     if (FIPS_mode_set(1) == 0) {
-        fips_rc = ERR_get_error();
+        unsigned long fips_rc = ERR_get_error();
+        char ssl_error_buf[256]; // Openssl claims you need no more than 120 bytes for error strings
         fprintf(stderr, "s2nd failed to enter FIPS mode with RC: %lu; String: %s\n", fips_rc, ERR_error_string(fips_rc, ssl_error_buf));
     }
     printf("s2nd entered FIPS mode\n");
