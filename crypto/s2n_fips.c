@@ -28,5 +28,5 @@ int s2n_is_in_fips_mode()
 #endif
 
     /* FIPS mode is not supported or FIPS mode is not enabled */
-    return 0;
+    return 1;
 }
